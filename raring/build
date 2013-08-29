@@ -1,0 +1,10 @@
+#!/bin/sh
+
+[ -d raring ] || sudo debootstrap raring raring > /dev/null
+sudo rm raring/var/cache/apt/archives/*.deb
+echo "force-unsafe-io" | sudo tee -a raring/etc/dpkg/dpkg.cfg.d/02apt-speedup
+echo "Acquire::http {No-Cache=True;};" | sudo tee -a raring/etc/apt/apt.conf.d/no-cache
+echo "Acquire::http { proxy \"http://192.168.1.42:3142\"; };" | sudo tee raring/etc/apt/apt.conf.d/apt-cacher
+echo "deb http://mirrors.us.kernel.org/ubuntu/ raring main restricted universe multiverse" | sudo tee raring/etc/apt/sources.list
+sudo tar -C raring -c . | sudo docker import - ubuntu raring
+
